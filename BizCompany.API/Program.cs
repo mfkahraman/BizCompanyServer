@@ -13,6 +13,17 @@ builder.Services.AddDbContext<AppDbContext>(option =>
     option.UseLazyLoadingProxies();
 });
 
+//CORS Policy in order to allow any origin, method, and header. We will consume this API from 4200 port in Angular application.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 //In order to ignore circular references
 builder.Services.AddControllers().AddJsonOptions(config =>
     config.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
@@ -29,6 +40,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//In order to use CORS policy
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
