@@ -8,15 +8,8 @@ namespace BizCompany.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController(AppDbContext _context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public ProductsController(AppDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
@@ -39,7 +32,6 @@ namespace BizCompany.API.Controllers
         }
 
         // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, ProductDto productDto)
         {
@@ -49,7 +41,7 @@ namespace BizCompany.API.Controllers
                 return NotFound();
             }
 
-            product.ProductName = productDto.ProductName;
+            product.ProductName = productDto.ProductName!;
             product.Description = productDto.Description;
             product.ImagePath = productDto.ImagePath;
             product.CategoryId = productDto.CategoryId;
@@ -76,13 +68,16 @@ namespace BizCompany.API.Controllers
         }
 
         // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(ProductDto productDto)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
             var product = new Product
             {
-                ProductName = productDto.ProductName,
+                ProductName = productDto.ProductName!,
                 Description = productDto.Description,
                 ImagePath = productDto.ImagePath,
                 CategoryId = productDto.CategoryId
