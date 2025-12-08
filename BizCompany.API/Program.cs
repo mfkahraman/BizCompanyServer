@@ -13,7 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
     //In order to using Lazy Loading
-    option.UseLazyLoadingProxies();
+    //option.UseLazyLoadingProxies();
 });
 
 //CORS Policy in order to allow any origin, method, and header. We will consume this API from 4200 port in Angular application.
