@@ -35,6 +35,9 @@ namespace BizCompany.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, ProductDto productDto)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
