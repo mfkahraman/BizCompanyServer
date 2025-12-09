@@ -156,14 +156,12 @@ namespace BizCompany.API.Migrations
                         name: "FK_Blogs_BlogCategories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "BlogCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Blogs_Writers_WriterId",
                         column: x => x.WriterId,
                         principalTable: "Writers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -171,7 +169,8 @@ namespace BizCompany.API.Migrations
                 columns: table => new
                 {
                     BlogId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false)
+                    TagId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,14 +208,12 @@ namespace BizCompany.API.Migrations
                         name: "FK_Comments_Blogs_BlogId",
                         column: x => x.BlogId,
                         principalTable: "Blogs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_Writers_WriterId",
                         column: x => x.WriterId,
                         principalTable: "Writers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -249,8 +246,7 @@ namespace BizCompany.API.Migrations
                 table: "Products",
                 column: "CategoryId",
                 principalTable: "Categories",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />

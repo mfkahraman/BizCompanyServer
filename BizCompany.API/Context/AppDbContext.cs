@@ -31,6 +31,7 @@ namespace BizCompany.API.Context
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
             modelBuilder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Tag>().HasQueryFilter(t => !t.IsDeleted);
+            modelBuilder.Entity<BlogTag>().HasQueryFilter(bt => !bt.IsDeleted);
             modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Writer>().HasQueryFilter(w => !w.IsDeleted);
             modelBuilder.Entity<Testimonial>().HasQueryFilter(t => !t.IsDeleted);

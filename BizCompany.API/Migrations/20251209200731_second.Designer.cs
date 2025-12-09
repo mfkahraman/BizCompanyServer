@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BizCompany.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251208201406_second")]
+    [Migration("20251209200731_second")]
     partial class second
     {
         /// <inheritdoc />
@@ -92,6 +92,9 @@ namespace BizCompany.API.Migrations
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.HasKey("BlogId", "TagId");
 
@@ -321,13 +324,11 @@ namespace BizCompany.API.Migrations
                 {
                     b.HasOne("BizCompany.API.Entities.BlogCategory", "Category")
                         .WithMany("Blogs")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("BizCompany.API.Entities.Writer", "Writer")
                         .WithMany("Blogs")
-                        .HasForeignKey("WriterId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("WriterId");
 
                     b.Navigation("Category");
 
@@ -357,13 +358,11 @@ namespace BizCompany.API.Migrations
                 {
                     b.HasOne("BizCompany.API.Entities.Blog", "Blog")
                         .WithMany("Comments")
-                        .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("BlogId");
 
                     b.HasOne("BizCompany.API.Entities.Writer", "Writer")
                         .WithMany("Comments")
-                        .HasForeignKey("WriterId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("WriterId");
 
                     b.Navigation("Blog");
 
@@ -374,8 +373,7 @@ namespace BizCompany.API.Migrations
                 {
                     b.HasOne("BizCompany.API.Entities.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
