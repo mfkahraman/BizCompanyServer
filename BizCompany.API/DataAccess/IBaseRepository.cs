@@ -5,10 +5,10 @@ namespace BizCompany.API.DataAccess
 {
     public interface IBaseRepository<T> where T : class
     {
-        Task<List<IEntity>> GetAllAsync();
-        Task<IEntity> GetByIdAsync(int id);
-        Task<bool> CreateAsync(IEntity entity);
-        Task<bool> UpdateAsync(IEntity entity);
+        Task<List<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        Task<bool> CreateAsync(T entity);
+        Task<bool> UpdateAsync(T entity);
         Task<bool> RemoveAsync(int id);
     }
 }
