@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class BlogTag
+    public class BlogTag : IEntity
     {
         public int BlogId { get; set; }
         public Blog? Blog { get; set; }

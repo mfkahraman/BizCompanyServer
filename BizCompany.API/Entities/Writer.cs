@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class Writer
+    public class Writer : IEntity
     {
         public int Id { get; set; }
         public string? FullName { get; set; }

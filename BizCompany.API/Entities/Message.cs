@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class Message
+    public class Message : IEntity
     {
         public int Id { get; set; }
         public string? SenderName { get; set; }

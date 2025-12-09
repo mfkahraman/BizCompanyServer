@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-
-namespace BizCompany.API.Entities
+﻿namespace BizCompany.API.Entities
 {
-    public class Blog
+    public class Blog : IEntity
     {
         public int Id { get; set; }
         public string? Title { get; set; }

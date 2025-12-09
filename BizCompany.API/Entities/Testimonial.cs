@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class Testimonial
+    public class Testimonial : IEntity
     {
         public int Id { get; set; }
         public string? ClientName { get; set; }

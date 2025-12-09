@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class Comment
+    public class Comment : IEntity
     {
         public int Id { get; set; }
         public int? BlogId { get; set; } //Delete Behavior için nullable yaptım
