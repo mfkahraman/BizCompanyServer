@@ -6,8 +6,7 @@ namespace BizCompany.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BlogsController(IBaseRepository<Blog> repository,
-                                 BlogRepository blogRepository)
+    public class BlogCategoriesController(IBaseRepository<BlogCategory> repository)
         : ControllerBase
     {
         [HttpGet]
@@ -17,17 +16,6 @@ namespace BizCompany.API.Controllers
             if (values == null || !values.Any())
             {
                 return NotFound("No blogs found.");
-            }
-            return Ok(values);
-        }
-
-        [HttpGet("get-blogs-with-details")]
-        public async Task<IActionResult> GetBlogsWithDetails()
-        {
-            var values = await blogRepository.GetBlogsWithDetailsAsync();
-            if (values == null || !values.Any())
-            {
-                return NotFound("No blogs with details found.");
             }
             return Ok(values);
         }
@@ -44,11 +32,11 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Blog blog)
+        public async Task<IActionResult> Create(BlogCategory value)
         {
             try
             {
-                var result = repository.CreateAsync(blog);
+                var result = repository.CreateAsync(value);
                 if (result == null)
                 {
                     return BadRequest("Failed to create blog.");
@@ -63,14 +51,14 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Blog blog)
+        public async Task<IActionResult> Update(int id, BlogCategory value)
         {
-            if (id != blog.Id)
+            if (id != value.Id)
                 return BadRequest("URL'deki id ile gövdedeki id uyuşmuyor.");
 
             try
             {
-                var result = await repository.UpdateAsync(blog);
+                var result = await repository.UpdateAsync(value);
 
                 if (!result)
                     return BadRequest("Kayıt güncellenirken bir sorun oluştu");
