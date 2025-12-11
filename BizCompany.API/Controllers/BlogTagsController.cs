@@ -13,7 +13,7 @@ namespace BizCompany.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var values = await repository.GetAllAsync();
-            if (values == null || !values.Any())
+            if (values == null || values.Count == 0)
             {
                 return NotFound("No blogs found.");
             }

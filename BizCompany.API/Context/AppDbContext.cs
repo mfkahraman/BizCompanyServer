@@ -20,11 +20,6 @@ namespace BizCompany.API.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // BlogTag için composite key - ZORUNLU
-            // Bunu yapmayınca migration oluştururken primary key hatası veriyor
-            modelBuilder.Entity<BlogTag>()
-                .HasKey(bt => new { bt.BlogId, bt.TagId });
-
             // Soft delete filters
             modelBuilder.Entity<Blog>().HasQueryFilter(b => !b.IsDeleted);
             modelBuilder.Entity<BlogCategory>().HasQueryFilter(bc => !bc.IsDeleted);
