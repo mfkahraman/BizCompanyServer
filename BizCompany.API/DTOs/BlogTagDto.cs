@@ -1,6 +1,4 @@
-﻿using BizCompany.API.Entities;
-
-namespace BizCompany.API.DTOs
+﻿namespace BizCompany.API.DTOs
 {
     public class BlogTagDto
     {

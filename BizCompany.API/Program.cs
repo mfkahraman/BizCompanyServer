@@ -40,6 +40,8 @@ builder.Services.AddFluentValidationAutoValidation()
 
 //Service Registrations
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+//BlogRepository Registration
+builder.Services.AddScoped<BlogRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

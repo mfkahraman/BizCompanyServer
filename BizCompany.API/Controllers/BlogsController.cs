@@ -15,11 +15,35 @@ namespace BizCompany.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var values = await repository.GetAllAsync();
-            if (values == null || !values.Any())
+            if (values == null || values.Count == 0)
             {
                 return NotFound("No blogs found.");
             }
-            return Ok(values);
+
+            try
+            {
+                var blogs = new List<GetBlogDto>();
+                foreach (var blog in values)
+                {
+                    blogs.Add(new GetBlogDto
+                    {
+                        Id = blog.Id,
+                        Title = blog.Title,
+                        Content = blog.Content,
+                        CoverImageUrl = blog.CoverImageUrl,
+                        ContentImageUrl = blog.ContentImageUrl,
+                        CreatedAt = blog.CreatedAt,
+                        WriterId = blog.WriterId,
+                        CategoryId = blog.CategoryId
+                    });
+                }
+
+                return Ok(blogs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Bloglar DTO'lara dönüştürülürken hata oldu: {ex.Message}");
+            }
         }
 
         [HttpGet("get-blogs-with-details")]
@@ -41,7 +65,18 @@ namespace BizCompany.API.Controllers
             {
                 return NotFound($"Blog with ID {id} not found.");
             }
-            return Ok(value);
+            var blogDto = new GetBlogDto
+            {
+                Id = value.Id,
+                Title = value.Title,
+                Content = value.Content,
+                CoverImageUrl = value.CoverImageUrl,
+                ContentImageUrl = value.ContentImageUrl,
+                CreatedAt = value.CreatedAt,
+                WriterId = value.WriterId,
+                CategoryId = value.CategoryId
+            };
+            return Ok(blogDto);
         }
 
         [HttpPost]
