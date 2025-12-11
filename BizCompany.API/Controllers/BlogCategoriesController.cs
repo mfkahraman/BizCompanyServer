@@ -1,4 +1,5 @@
 ﻿using BizCompany.API.DataAccess;
+using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,17 +33,22 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(BlogCategory value)
+        public async Task<IActionResult> Create(BlogCategoryDto value)
         {
             try
             {
-                var result = repository.CreateAsync(value);
-                if (result == null)
+                BlogCategory entity = new BlogCategory
+                {
+                    Name = value.Name
+                };
+
+                var result = await repository.CreateAsync(entity);
+                if (!result)
                 {
                     return BadRequest("Failed to create blog.");
                 }
 
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity);
             }
             catch (Exception ex)
             {
@@ -51,14 +57,16 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, BlogCategory value)
+        public async Task<IActionResult> Update(int id, BlogCategoryDto value)
         {
-            if (id != value.Id)
-                return BadRequest("URL'deki id ile gövdedeki id uyuşmuyor.");
-
             try
             {
-                var result = await repository.UpdateAsync(value);
+                BlogCategory entity = new BlogCategory
+                {
+                    Id = id,
+                    Name = value.Name
+                };
+                var result = await repository.UpdateAsync(entity);
 
                 if (!result)
                     return BadRequest("Kayıt güncellenirken bir sorun oluştu");

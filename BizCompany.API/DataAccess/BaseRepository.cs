@@ -12,8 +12,11 @@ namespace BizCompany.API.DataAccess
             var result = await context.Set<T>().AddAsync(entity);
             if (result != null)
             {
-                await context.SaveChangesAsync();
-                return true;
+                var saveResult = await context.SaveChangesAsync();
+                if(saveResult > 0)
+                {
+                    return true;
+                }
             }
             return false;
         }
