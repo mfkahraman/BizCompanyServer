@@ -8,7 +8,7 @@
         public int? WriterId { get; set; } //Delete Behavior için nullable yaptım
         public Writer? Writer { get; set; }
         public string? Content { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
     }
 }
