@@ -29,12 +29,11 @@ namespace BizCompany.API.DataAccess
                                 .ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
             return await context.Set<T>()
                           .Where(x => !x.IsDeleted && x.Id == id)
-                          .FirstOrDefaultAsync()
-                          ?? throw new KeyNotFoundException($"{typeof(T).Name} with id {id} not found.");
+                          .FirstOrDefaultAsync();
         }
 
         public async Task<bool> RemoveAsync(int id)

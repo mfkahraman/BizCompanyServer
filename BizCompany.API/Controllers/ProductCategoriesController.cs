@@ -7,7 +7,7 @@ namespace BizCompany.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController(IBaseRepository<Product> repository)
+    public class ProductCategoriesController(IBaseRepository<ProductCategory> repository)
         : ControllerBase
     {
         [HttpGet]
@@ -16,16 +16,13 @@ namespace BizCompany.API.Controllers
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
             {
-                return BadRequest("Hiç kayıt bulunamadı.");
+                return BadRequest("No records found.");
             }
 
-            var records = values.Select(x => new GetProductDto
+            var records = values.Select(x => new GetCategoryDto
             {
                 Id = x.Id,
-                ProductName = x.ProductName,
-                Description = x.Description,
-                ImagePath = x.ImagePath,
-                CategoryId = x.CategoryId
+                CategoryName = x.CategoryName
             }).ToList();
 
             return Ok(records);
@@ -37,38 +34,32 @@ namespace BizCompany.API.Controllers
             var value = await repository.GetByIdAsync(id);
             if (value == null)
             {
-                return NotFound($"{id} nolu ID ile bir kayıt bulunamadı");
+                return NotFound($"Record with ID {id} not found.");
             }
 
-            var dto = new GetProductDto
+            var dto = new GetCategoryDto
             {
                 Id = value.Id,
-                ProductName = value.ProductName,
-                Description = value.Description,
-                ImagePath = value.ImagePath,
-                CategoryId = value.CategoryId
+                CategoryName = value.CategoryName
             };
 
             return Ok(dto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProductDto dto)
+        public async Task<IActionResult> Create(ProductCategoryDto dto)
         {
             try
             {
-                var value = new Product
+                var value = new ProductCategory
                 {
-                    ProductName = dto.ProductName!,
-                    Description = dto.Description,
-                    ImagePath = dto.ImagePath,
-                    CategoryId = dto.CategoryId
+                    CategoryName = dto.CategoryName
                 };
 
                 var result = await repository.CreateAsync(value);
                 if (!result)
                 {
-                    return BadRequest("Kayıt oluşturulamadı.");
+                    return BadRequest("Failed to create record.");
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
@@ -80,7 +71,7 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, ProductDto dto)
+        public async Task<IActionResult> Update(int id, ProductCategoryDto dto)
         {
             try
             {
@@ -90,10 +81,7 @@ namespace BizCompany.API.Controllers
                     return NotFound($"{id} Id nolu kayıt bulunamadı.");
                 }
 
-                record.ProductName = dto.ProductName!;
-                record.Description = dto.Description;
-                record.ImagePath = dto.ImagePath;
-                record.CategoryId = dto.CategoryId;
+                record.CategoryName = dto.CategoryName;
 
                 var result = await repository.UpdateAsync(record);
 

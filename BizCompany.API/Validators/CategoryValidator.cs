@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BizCompany.API.Validators
 {
-    public class CategoryValidator : AbstractValidator<CategoryDto>
+    public class CategoryValidator : AbstractValidator<ProductCategoryDto>
     {
         public CategoryValidator()
         {

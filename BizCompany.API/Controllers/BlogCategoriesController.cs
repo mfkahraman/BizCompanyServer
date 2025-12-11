@@ -16,9 +16,16 @@ namespace BizCompany.API.Controllers
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
             {
-                return NotFound("No blogs found.");
+                return NotFound("No records found.");
             }
-            return Ok(values);
+            
+            var categories = values.Select(c => new GetBlogCategoryDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            });
+
+            return Ok(categories);
         }
 
         [HttpGet("{id}")]
@@ -27,9 +34,15 @@ namespace BizCompany.API.Controllers
             var value = await repository.GetByIdAsync(id);
             if (value == null)
             {
-                return NotFound($"Blog with ID {id} not found.");
+                return NotFound($"Record with ID {id} not found.");
             }
-            return Ok(value);
+
+            var categoryDto = new GetBlogCategoryDto
+            {
+                Id = value.Id,
+                Name = value.Name
+            };
+            return Ok(categoryDto);
         }
 
         [HttpPost]
@@ -37,7 +50,7 @@ namespace BizCompany.API.Controllers
         {
             try
             {
-                BlogCategory entity = new BlogCategory
+                var entity = new BlogCategory
                 {
                     Name = value.Name
                 };
@@ -45,7 +58,7 @@ namespace BizCompany.API.Controllers
                 var result = await repository.CreateAsync(entity);
                 if (!result)
                 {
-                    return BadRequest("Failed to create blog.");
+                    return BadRequest("Failed to create record.");
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity);
@@ -61,7 +74,7 @@ namespace BizCompany.API.Controllers
         {
             try
             {
-                BlogCategory entity = new BlogCategory
+                var entity = new BlogCategory
                 {
                     Id = id,
                     Name = value.Name

@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.DTOs
 {
-    public class CategoryDto
+    public class ProductCategoryDto
     {
         public required string CategoryName { get; set; }
     }

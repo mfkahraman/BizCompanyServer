@@ -16,9 +16,16 @@ namespace BizCompany.API.Controllers
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
             {
-                return NotFound("No blogs found.");
+                return BadRequest("No records found.");
             }
-            return Ok(values);
+
+            var records = values.Select(x => new BlogTagDto
+            {
+                BlogId = x.BlogId,
+                TagId = x.TagId
+            });
+
+            return Ok(records);
         }
 
         [HttpGet("{id}")]
@@ -27,9 +34,16 @@ namespace BizCompany.API.Controllers
             var value = await repository.GetByIdAsync(id);
             if (value == null)
             {
-                return NotFound($"Blog with ID {id} not found.");
+                return NotFound($"Record with ID {id} not found.");
             }
-            return Ok(value);
+
+            var dto = new BlogTagDto
+            {
+                BlogId = value.BlogId,
+                TagId = value.TagId
+            };
+
+            return Ok(dto);
         }
 
         [HttpPost]
@@ -46,7 +60,7 @@ namespace BizCompany.API.Controllers
                 var result = await repository.CreateAsync(blogTag);
                 if (!result)
                 {
-                    return BadRequest("Failed to create blog.");
+                    return BadRequest("Failed to create record.");
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = blogTag.Id }, blogTag);

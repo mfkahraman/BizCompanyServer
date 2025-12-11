@@ -1,6 +1,6 @@
 ﻿namespace BizCompany.API.Entities
 {
-    public class Category : IEntity
+    public class ProductCategory : IEntity
     {
         public int Id { get; set; }
         public required string CategoryName { get; set; }

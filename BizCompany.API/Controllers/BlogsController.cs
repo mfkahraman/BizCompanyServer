@@ -22,21 +22,17 @@ namespace BizCompany.API.Controllers
 
             try
             {
-                var blogs = new List<GetBlogDto>();
-                foreach (var blog in values)
+                var blogs = values.Select(values => new GetBlogDto
                 {
-                    blogs.Add(new GetBlogDto
-                    {
-                        Id = blog.Id,
-                        Title = blog.Title,
-                        Content = blog.Content,
-                        CoverImageUrl = blog.CoverImageUrl,
-                        ContentImageUrl = blog.ContentImageUrl,
-                        CreatedAt = blog.CreatedAt,
-                        WriterId = blog.WriterId,
-                        CategoryId = blog.CategoryId
-                    });
-                }
+                    Id = values.Id,
+                    Title = values.Title,
+                    Content = values.Content,
+                    CoverImageUrl = values.CoverImageUrl,
+                    ContentImageUrl = values.ContentImageUrl,
+                    CreatedAt = values.CreatedAt,
+                    WriterId = values.WriterId,
+                    CategoryId = values.CategoryId
+                }).ToList();
 
                 return Ok(blogs);
             }

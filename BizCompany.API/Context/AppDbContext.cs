@@ -5,7 +5,7 @@ namespace BizCompany.API.Context
 {
     public class AppDbContext(DbContextOptions options) : DbContext(options)
     {
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<BlogCategory> BlogCategories { get; set; }
@@ -24,7 +24,7 @@ namespace BizCompany.API.Context
             modelBuilder.Entity<Blog>().HasQueryFilter(b => !b.IsDeleted);
             modelBuilder.Entity<BlogCategory>().HasQueryFilter(bc => !bc.IsDeleted);
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
-            modelBuilder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<ProductCategory>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Tag>().HasQueryFilter(t => !t.IsDeleted);
             modelBuilder.Entity<BlogTag>().HasQueryFilter(bt => !bt.IsDeleted);
             modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
