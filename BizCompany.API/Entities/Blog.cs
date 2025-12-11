@@ -7,7 +7,7 @@
         public string? Content { get; set; }
         public string? CoverImageUrl { get; set; }
         public string? ContentImageUrl { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
         public int? WriterId { get; set; } //Delete Behavior için nullable yaptım
         public Writer? Writer { get; set; }

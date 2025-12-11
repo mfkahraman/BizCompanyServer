@@ -1,4 +1,5 @@
 ﻿using BizCompany.API.DataAccess;
+using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,17 +45,26 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Blog blog)
+        public async Task<IActionResult> Create(BlogDto dto)
         {
             try
             {
-                var result = repository.CreateAsync(blog);
-                if (result == null)
+                Blog blog = new()
+                {
+                    Title = dto.Title,
+                    Content = dto.Content,
+                    CoverImageUrl = dto.CoverImageUrl,
+                    ContentImageUrl = dto.ContentImageUrl,
+                    WriterId = dto.WriterId,
+                    CategoryId = dto.CategoryId,
+                };
+                var result = await repository.CreateAsync(blog);
+                if (!result)
                 {
                     return BadRequest("Failed to create blog.");
                 }
 
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = blog.Id }, blog);
             }
             catch (Exception ex)
             {
@@ -63,13 +73,21 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Blog blog)
+        public async Task<IActionResult> Update(int id, BlogDto dto)
         {
-            if (id != blog.Id)
-                return BadRequest("URL'deki id ile gövdedeki id uyuşmuyor.");
-
             try
             {
+                Blog blog = new()
+                {
+                    Id = id,
+                    Title = dto.Title,
+                    Content = dto.Content,
+                    CoverImageUrl = dto.CoverImageUrl,
+                    ContentImageUrl = dto.ContentImageUrl,
+                    WriterId = dto.WriterId,
+                    CategoryId = dto.CategoryId,
+                };
+
                 var result = await repository.UpdateAsync(blog);
 
                 if (!result)

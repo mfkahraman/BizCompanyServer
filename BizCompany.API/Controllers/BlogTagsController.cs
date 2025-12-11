@@ -1,4 +1,5 @@
 ﻿using BizCompany.API.DataAccess;
+using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,17 +33,23 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(BlogTag value)
+        public async Task<IActionResult> Create(BlogTagDto dto)
         {
             try
             {
-                var result = repository.CreateAsync(value);
-                if (result == null)
+                var blogTag = new BlogTag
+                {
+                    BlogId = dto.BlogId,
+                    TagId = dto.TagId
+                };
+
+                var result = await repository.CreateAsync(blogTag);
+                if (!result)
                 {
                     return BadRequest("Failed to create blog.");
                 }
 
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = blogTag.Id }, blogTag);
             }
             catch (Exception ex)
             {
@@ -51,14 +58,20 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, BlogTag value)
+        public async Task<IActionResult> Update(int id, BlogTagDto dto)
         {
-            if (id != value.Id)
-                return BadRequest("URL'deki id ile gövdedeki id uyuşmuyor.");
-
             try
             {
-                var result = await repository.UpdateAsync(value);
+                var record = await repository.GetByIdAsync(id);
+                if (record == null)
+                {
+                    return NotFound($"{id} Id nolu kayıt bulunamadı.");
+                }
+
+                record.BlogId = dto.BlogId;
+                record.TagId = dto.TagId;
+
+                var result = await repository.UpdateAsync(record);
 
                 if (!result)
                     return BadRequest("Kayıt güncellenirken bir sorun oluştu");
