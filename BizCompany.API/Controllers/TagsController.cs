@@ -92,7 +92,7 @@ namespace BizCompany.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Güncelleme işlemi sırasında bir sorun oluştu: {ex.Tag}");
+                return BadRequest($"Güncelleme işlemi sırasında bir sorun oluştu: {ex.Message}");
             }
         }
 
@@ -113,7 +113,7 @@ namespace BizCompany.API.Controllers
 
             catch (Exception ex)
             {
-                return BadRequest($"Silme işlemi sırasında bir sorun oluştu: {ex.Tag}");
+                return BadRequest($"Silme işlemi sırasında bir sorun oluştu: {ex.Message}");
             }
         }
     }
