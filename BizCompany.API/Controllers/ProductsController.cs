@@ -7,7 +7,8 @@ namespace BizCompany.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController(IBaseRepository<Product> repository)
+    public class ProductsController(IBaseRepository<Product> repository,
+                                    ProductRepository productRepository)
         : ControllerBase
     {
         [HttpGet]
@@ -29,6 +30,17 @@ namespace BizCompany.API.Controllers
             }).ToList();
 
             return Ok(records);
+        }
+
+        [HttpGet("get-products-with-details")]
+        public async Task<IActionResult> GetProductsWithDetails()
+        {
+            var values = await productRepository.GetProductsWithDetailAsync();
+            if (values == null || values.Count == 0)
+            {
+                return NotFound("Detaylı ürün kaydı bulunamadı.");
+            }
+            return Ok(values);
         }
 
         [HttpGet("{id}")]

@@ -1,7 +1,6 @@
 ﻿using BizCompany.API.Context;
 using BizCompany.API.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace BizCompany.API.DataAccess
 {
