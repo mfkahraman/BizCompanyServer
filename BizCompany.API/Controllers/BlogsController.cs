@@ -195,8 +195,12 @@ namespace BizCompany.API.Controllers
                     ContentImageUrl = dto.ContentImageUrl,
                     WriterId = dto.WriterId,
                     CategoryId = dto.CategoryId,
+                    BlogTags = dto.BlogTags?.Select(bt => new BlogTag
+                    {
+                        TagId = bt.TagId
+                    }).ToList()
                 };
-                var result = await repository.CreateAsync(blog);
+                var result = await blogRepository.CreateBlogAsync(blog);
                 if (!result)
                 {
                     return BadRequest("Failed to create blog.");
@@ -224,9 +228,13 @@ namespace BizCompany.API.Controllers
                     ContentImageUrl = dto.ContentImageUrl,
                     WriterId = dto.WriterId,
                     CategoryId = dto.CategoryId,
+                    BlogTags = dto.BlogTags?.Select(bt => new BlogTag
+                    {
+                        TagId = bt.TagId
+                    }).ToList()
                 };
 
-                var result = await repository.UpdateAsync(blog);
+                var result = await blogRepository.UpdateBlogAsync(blog);
 
                 if (!result)
                     return BadRequest("Kayıt güncellenirken bir sorun oluştu");

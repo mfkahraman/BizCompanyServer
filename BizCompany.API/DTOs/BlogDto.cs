@@ -8,6 +8,12 @@
         public string? ContentImageUrl { get; set; }
         public int? WriterId { get; set; } 
         public int? CategoryId { get; set; }
+        public List<BlogTagInput>? BlogTags { get; set; }
+
+        public class BlogTagInput
+        {
+            public int TagId { get; set; }
+        }
 
     }
 }

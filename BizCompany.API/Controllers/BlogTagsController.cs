@@ -51,9 +51,14 @@ namespace BizCompany.API.Controllers
         {
             try
             {
+                if (!dto.BlogId.HasValue)
+                {
+                    return BadRequest("BlogId is required.");
+                }
+
                 var blogTag = new BlogTag
                 {
-                    BlogId = dto.BlogId,
+                    BlogId = dto.BlogId.Value,
                     TagId = dto.TagId
                 };
 
@@ -76,13 +81,18 @@ namespace BizCompany.API.Controllers
         {
             try
             {
+                if (!dto.BlogId.HasValue)
+                {
+                    return BadRequest("BlogId is required.");
+                }
+
                 var record = await repository.GetByIdAsync(id);
                 if (record == null)
                 {
                     return NotFound($"{id} Id nolu kayıt bulunamadı.");
                 }
 
-                record.BlogId = dto.BlogId;
+                record.BlogId = dto.BlogId.Value;
                 record.TagId = dto.TagId;
 
                 var result = await repository.UpdateAsync(record);
