@@ -16,7 +16,7 @@ namespace BizCompany.API.Controllers
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
             {
-                return BadRequest("Hiç kayıt bulunamadı.");
+                return BadRequest("No records found.");
             }
 
             var records = values.Select(x => new GetWriterDto
@@ -36,7 +36,7 @@ namespace BizCompany.API.Controllers
             var value = await repository.GetByIdAsync(id);
             if (value == null)
             {
-                return NotFound($"{id} nolu ID ile bir kayıt bulunamadı");
+                return NotFound($"No record found with ID {id}");
             }
 
             var dto = new GetWriterDto
@@ -65,7 +65,7 @@ namespace BizCompany.API.Controllers
                 var result = await repository.CreateAsync(value);
                 if (!result)
                 {
-                    return BadRequest("Kayıt oluşturulamadı.");
+                    return BadRequest("Record could not be created.");
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
@@ -84,7 +84,7 @@ namespace BizCompany.API.Controllers
                 var record = await repository.GetByIdAsync(id);
                 if (record == null)
                 {
-                    return NotFound($"{id} Id nolu kayıt bulunamadı.");
+                    return NotFound($"Record with ID {id} not found.");
                 }
 
                 record.FullName = dto.FullName;
@@ -94,13 +94,13 @@ namespace BizCompany.API.Controllers
                 var result = await repository.UpdateAsync(record);
 
                 if (!result)
-                    return BadRequest("Kayıt güncellenirken bir sorun oluştu");
+                    return BadRequest("An error occurred while updating the record");
 
-                return Ok("Başarılı şekilde güncellendi");
+                return Ok("Successfully updated");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Güncelleme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the update operation: {ex.Message}");
             }
         }
 
@@ -113,15 +113,15 @@ namespace BizCompany.API.Controllers
 
                 if (!result)
                 {
-                    return BadRequest($"{id} Id nolu kayıt silinirken bir hata oluştu.");
+                    return BadRequest($"An error occurred while deleting the record with ID {id}.");
                 }
 
-                return Ok($"{id} Id nolu kayıt başarıyla silindi.");
+                return Ok($"Record with ID {id} successfully deleted.");
             }
 
             catch (Exception ex)
             {
-                return BadRequest($"Silme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the delete operation: {ex.Message}");
             }
         }
     }

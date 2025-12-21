@@ -8,9 +8,9 @@ namespace BizCompany.API.Validators
         public CategoryValidator()
         {
             RuleFor(x => x.CategoryName)
-                .NotEmpty().WithMessage("Kategori adı boş bırakılamaz.")
-                .MinimumLength(3).WithMessage("Kategori adı en az 3 karakter olmalıdır.")
-                .MaximumLength(100).WithMessage("Kategori adı en fazla 100 karakter olabilir.");
+                .NotEmpty().WithMessage("Category name cannot be empty.")
+                .MinimumLength(3).WithMessage("Category name must be at least 3 characters.")
+                .MaximumLength(100).WithMessage("Category name cannot exceed 100 characters.");
         }
     }
 }

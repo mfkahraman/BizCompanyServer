@@ -89,7 +89,7 @@ namespace BizCompany.API.Controllers
                 var record = await repository.GetByIdAsync(id);
                 if (record == null)
                 {
-                    return NotFound($"{id} Id nolu kayıt bulunamadı.");
+                    return NotFound($"Record with ID {id} not found.");
                 }
 
                 record.BlogId = dto.BlogId.Value;
@@ -98,13 +98,13 @@ namespace BizCompany.API.Controllers
                 var result = await repository.UpdateAsync(record);
 
                 if (!result)
-                    return BadRequest("Kayıt güncellenirken bir sorun oluştu");
+                    return BadRequest("An error occurred while updating the record");
 
-                return Ok("Başarılı şekilde güncellendi");
+                return Ok("Successfully updated");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Güncelleme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the update operation: {ex.Message}");
             }
         }
 
@@ -117,15 +117,15 @@ namespace BizCompany.API.Controllers
 
                 if (!result)
                 {
-                    return BadRequest($"{id} Id nolu kayıt silinirken bir hata oluştu.");
+                    return BadRequest($"An error occurred while deleting the record with ID {id}.");
                 }
 
-                return Ok($"{id} Id nolu kayıt başarıyla silindi.");
+                return Ok($"Record with ID {id} successfully deleted.");
             }
 
             catch (Exception ex)
             {
-                return BadRequest($"Silme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the delete operation: {ex.Message}");
             }
         }
     }

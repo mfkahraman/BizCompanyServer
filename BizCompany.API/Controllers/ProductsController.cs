@@ -1,7 +1,6 @@
 ﻿using BizCompany.API.DataAccess;
 using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BizCompany.API.Controllers
@@ -9,7 +8,8 @@ namespace BizCompany.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController(IBaseRepository<Product> repository,
-                                    ProductRepository productRepository)
+                                    ProductRepository productRepository,
+                                    IImageService imageService)
         : ControllerBase
     {
         [HttpGet]
@@ -18,7 +18,7 @@ namespace BizCompany.API.Controllers
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
             {
-                return BadRequest("Hiç kayıt bulunamadı.");
+                return BadRequest("No records found.");
             }
 
             var records = values.Select(x => new GetProductDto
@@ -44,7 +44,7 @@ namespace BizCompany.API.Controllers
             var values = await productRepository.GetProductsWithDetailAsync();
             if (values == null || values.Count == 0)
             {
-                return NotFound("Detaylı ürün kaydı bulunamadı.");
+                return NotFound("No detailed product records found.");
             }
             return Ok(values);
         }
@@ -55,7 +55,7 @@ namespace BizCompany.API.Controllers
             var value = await repository.GetByIdAsync(id);
             if (value == null)
             {
-                return NotFound($"{id} nolu ID ile bir kayıt bulunamadı");
+                return NotFound($"No record found with ID {id}");
             }
 
             var dto = new GetProductDto
@@ -76,10 +76,33 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProductDto dto)
+        public async Task<IActionResult> Create([FromForm] ProductDto dto)
         {
+            string? savedThumbnailPath = null;
+            string? savedHeroPath = null;
+
             try
             {
+                if (dto.ThumbnailImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.ThumbnailImageFile);
+                    if (validationError != null) return validationError;
+
+                    savedThumbnailPath = await imageService.SaveImageAsync(
+                        dto.ThumbnailImageFile, "products");
+                    dto.ThumbnailImagePath = savedThumbnailPath;
+                }
+
+                if (dto.HeroImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.HeroImageFile);
+                    if (validationError != null) return validationError;
+
+                    savedHeroPath = await imageService.SaveImageAsync(
+                        dto.HeroImageFile, "products");
+                    dto.ImagePath = savedHeroPath;
+                }
+
                 var value = new Product
                 {
                     ProductName = dto.ProductName!,
@@ -88,32 +111,73 @@ namespace BizCompany.API.Controllers
                     CategoryId = dto.CategoryId,
                     ClientName = dto.ClientName,
                     ProjectUrl = dto.ProjectUrl,
-                    ProjectDate = dto.ProjectDate
+                    ProjectDate = dto.ProjectDate,
+                    ImagePath = dto.ImagePath,
+                    ThumbnailImagePath = dto.ThumbnailImagePath
                 };
 
                 var result = await repository.CreateAsync(value);
                 if (!result)
                 {
-                    return BadRequest("Kayıt oluşturulamadı.");
+                    // Cleanup on failure
+                    if (savedThumbnailPath != null)
+                        await imageService.DeleteImageAsync(savedThumbnailPath);
+                    if (savedHeroPath != null)
+                        await imageService.DeleteImageAsync(savedHeroPath);
+
+                    return BadRequest("Record could not be created.");
                 }
 
                 return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
             }
             catch (Exception ex)
             {
+                // Cleanup uploaded images on exception
+                if (savedThumbnailPath != null)
+                    await imageService.DeleteImageAsync(savedThumbnailPath);
+                if (savedHeroPath != null)
+                    await imageService.DeleteImageAsync(savedHeroPath);
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, ProductDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] ProductDto dto)
         {
             try
             {
                 var record = await repository.GetByIdAsync(id);
                 if (record == null)
                 {
-                    return NotFound($"{id} Id nolu kayıt bulunamadı.");
+                    return NotFound($"Record with ID {id} not found.");
+                }
+
+                var oldThumbnailPath = record.ThumbnailImagePath;
+                var oldImagePath = record.ImagePath;
+
+                if (dto.ThumbnailImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.ThumbnailImageFile);
+                    if (validationError != null) return validationError;
+
+                    if (!string.IsNullOrEmpty(oldThumbnailPath))
+                        await imageService.DeleteImageAsync(oldThumbnailPath);
+
+                    var imagePath = await imageService.SaveImageAsync(dto.ThumbnailImageFile, "products");
+                    dto.ThumbnailImagePath = imagePath;
+                }
+
+                if (dto.HeroImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.HeroImageFile);
+                    if (validationError != null) return validationError;
+
+                    if (!string.IsNullOrEmpty(oldImagePath))
+                        await imageService.DeleteImageAsync(oldImagePath);
+
+                    var imagePath = await imageService.SaveImageAsync(dto.HeroImageFile, "products");
+                    dto.ImagePath = imagePath;
                 }
 
                 record.ProductName = dto.ProductName!;
@@ -124,16 +188,21 @@ namespace BizCompany.API.Controllers
                 record.ProjectUrl = dto.ProjectUrl;
                 record.ProjectDate = dto.ProjectDate;
 
+                if (dto.ThumbnailImageFile != null)
+                    record.ThumbnailImagePath = dto.ThumbnailImagePath;
+                if (dto.HeroImageFile != null)
+                    record.ImagePath = dto.ImagePath;
+
                 var result = await repository.UpdateAsync(record);
 
                 if (!result)
-                    return BadRequest("Kayıt güncellenirken bir sorun oluştu");
+                    return BadRequest("An error occurred while updating the record");
 
-                return Ok("Başarılı şekilde güncellendi");
+                return Ok("Successfully updated");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Güncelleme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the update operation: {ex.Message}");
             }
         }
 
@@ -142,20 +211,45 @@ namespace BizCompany.API.Controllers
         {
             try
             {
+                var record = await repository.GetByIdAsync(id);
+                if (record == null)
+                {
+                    return BadRequest($"Record with ID {id} not found.");
+                }
+
+                if (!string.IsNullOrEmpty(record.ThumbnailImagePath))
+                    await imageService.DeleteImageAsync(record.ThumbnailImagePath);
+
+                if (!string.IsNullOrEmpty(record.ImagePath))
+                    await imageService.DeleteImageAsync(record.ImagePath);
+
                 var result = await repository.RemoveAsync(id);
 
                 if (!result)
                 {
-                    return BadRequest($"{id} Id nolu kayıt silinirken bir hata oluştu.");
+                    return BadRequest($"An error occurred while deleting the record with ID {id}.");
                 }
 
-                return Ok($"{id} Id nolu kayıt başarıyla silindi.");
+                return Ok($"Record with ID {id} successfully deleted.");
             }
-
             catch (Exception ex)
             {
-                return BadRequest($"Silme işlemi sırasında bir sorun oluştu: {ex.Message}");
+                return BadRequest($"An error occurred during the delete operation: {ex.Message}");
             }
+        }
+
+        private BadRequestObjectResult? ValidateImageFile(IFormFile file)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                return BadRequest("Invalid file type. Only images are allowed.");
+
+            if (file.Length > 5 * 1024 * 1024) // 5MB
+                return BadRequest("File size cannot exceed 5MB.");
+
+            return null; // Valid
         }
     }
 }

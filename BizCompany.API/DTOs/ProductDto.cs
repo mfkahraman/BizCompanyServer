@@ -10,8 +10,9 @@
         public string? ClientName { get; set; }
         public string? ProjectUrl { get; set; }
         public DateTime? ProjectDate { get; set; }
-
-        public IFormFile? HeroImage { get; set; }
-        public IFormFile? ThumbnailImage { get; set; }
+        public string? ImagePath { get; set; }
+        public string? ThumbnailImagePath { get; set; }
+        public IFormFile? HeroImageFile { get; set; }
+        public IFormFile? ThumbnailImageFile { get; set; }
     }
 }

@@ -8,14 +8,13 @@ namespace BizCompany.API.Validators
         public ProductValidator()
         {
             RuleFor(x => x.ProductName)
-                .NotEmpty().WithMessage("Ürün adı boş bırakılamaz.")
-                .MinimumLength(3).WithMessage("Ürün adı en az 3 karakter olmalıdır.")
-                .MaximumLength(100).WithMessage("Ürün adı en fazla 100 karakter olabilir.");
+                .NotEmpty().WithMessage("Product name cannot be empty.")
+                .MinimumLength(3).WithMessage("Product name must be at least 3 characters.")
+                .MaximumLength(100).WithMessage("Product name cannot exceed 100 characters.");
             RuleFor(x => x.Description)
-                .MaximumLength(10000).WithMessage("Açıklama en fazla 10000 karakter olabilir.");
+                .MaximumLength(10000).WithMessage("Description cannot exceed 10000 characters.");
             RuleFor(x => x.CategoryId)
-                .GreaterThan(0).WithMessage("Geçersiz kategori ID'si.");
+                .GreaterThan(0).WithMessage("Invalid category ID.");
         }
     }
-}
- 
+} 

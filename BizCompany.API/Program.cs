@@ -43,6 +43,7 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 //BlogRepository Registration
 builder.Services.AddScoped<BlogRepository>();
 builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -59,6 +60,9 @@ if (app.Environment.IsDevelopment())
 
 //In order to use CORS policy
 app.UseCors("AllowAll");
+
+//In order to serve static files from wwwroot folder
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
