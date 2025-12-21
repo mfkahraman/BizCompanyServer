@@ -37,6 +37,7 @@ namespace BizCompany.API.DataAccess
                 .Include(bt => bt.BlogTags!)
                     .ThenInclude(t => t.Tag)
                 .Include(c => c.Comments!)
+                    .ThenInclude(w => w.Writer)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return value;

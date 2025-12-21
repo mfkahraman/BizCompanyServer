@@ -1,6 +1,7 @@
 ﻿using BizCompany.API.DataAccess;
 using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BizCompany.API.Controllers
@@ -23,10 +24,15 @@ namespace BizCompany.API.Controllers
             var records = values.Select(x => new GetProductDto
             {
                 Id = x.Id,
-                ProductName = x.ProductName,
+                ProductName = x.ProductName!,
+                ShortDescription = x.ShortDescription,
                 Description = x.Description,
                 ImagePath = x.ImagePath,
-                CategoryId = x.CategoryId
+                ThumbnailImagePath = x.ThumbnailImagePath,
+                CategoryId = x.CategoryId,
+                ClientName = x.ClientName,
+                ProjectUrl = x.ProjectUrl,
+                ProjectDate = x.ProjectDate
             }).ToList();
 
             return Ok(records);
@@ -55,10 +61,15 @@ namespace BizCompany.API.Controllers
             var dto = new GetProductDto
             {
                 Id = value.Id,
-                ProductName = value.ProductName,
+                ProductName = value.ProductName!,
+                ShortDescription = value.ShortDescription,
                 Description = value.Description,
                 ImagePath = value.ImagePath,
-                CategoryId = value.CategoryId
+                ThumbnailImagePath = value.ThumbnailImagePath,
+                CategoryId = value.CategoryId,
+                ClientName = value.ClientName,
+                ProjectUrl = value.ProjectUrl,
+                ProjectDate = value.ProjectDate
             };
 
             return Ok(dto);
@@ -72,9 +83,12 @@ namespace BizCompany.API.Controllers
                 var value = new Product
                 {
                     ProductName = dto.ProductName!,
+                    ShortDescription = dto.ShortDescription,
                     Description = dto.Description,
-                    ImagePath = dto.ImagePath,
-                    CategoryId = dto.CategoryId
+                    CategoryId = dto.CategoryId,
+                    ClientName = dto.ClientName,
+                    ProjectUrl = dto.ProjectUrl,
+                    ProjectDate = dto.ProjectDate
                 };
 
                 var result = await repository.CreateAsync(value);
@@ -103,9 +117,12 @@ namespace BizCompany.API.Controllers
                 }
 
                 record.ProductName = dto.ProductName!;
+                record.ShortDescription = dto.ShortDescription;
                 record.Description = dto.Description;
-                record.ImagePath = dto.ImagePath;
                 record.CategoryId = dto.CategoryId;
+                record.ClientName = dto.ClientName;
+                record.ProjectUrl = dto.ProjectUrl;
+                record.ProjectDate = dto.ProjectDate;
 
                 var result = await repository.UpdateAsync(record);
 

@@ -154,6 +154,13 @@ namespace BizCompany.API.Controllers
                     Id = c.Id,
                     Content = c.Content,
                     WriterId = c.WriterId,
+                    Writer = c.Writer != null ? new GetWriterDto
+                    {
+                        Id = c.Writer.Id,
+                        FullName = c.Writer.FullName,
+                        Bio = c.Writer.Bio,
+                        ImageUrl = c.Writer.ImageUrl
+                    } : null,
                     CreatedAt = c.CreatedAt
                 }).ToList()
             };
