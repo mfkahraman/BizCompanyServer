@@ -17,9 +17,7 @@ namespace BizCompany.API.Controllers
         {
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
-            {
-                return BadRequest("No records found.");
-            }
+                return NotFound("No records found.");
 
             var records = values.Select(x => new GetProductDto
             {
@@ -119,7 +117,6 @@ namespace BizCompany.API.Controllers
                 var result = await repository.CreateAsync(value);
                 if (!result)
                 {
-                    // Cleanup on failure
                     if (savedThumbnailPath != null)
                         await imageService.DeleteImageAsync(savedThumbnailPath);
                     if (savedHeroPath != null)
@@ -132,7 +129,6 @@ namespace BizCompany.API.Controllers
             }
             catch (Exception ex)
             {
-                // Cleanup uploaded images on exception
                 if (savedThumbnailPath != null)
                     await imageService.DeleteImageAsync(savedThumbnailPath);
                 if (savedHeroPath != null)

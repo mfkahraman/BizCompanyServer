@@ -10,6 +10,9 @@
         public int? CategoryId { get; set; }
         public List<BlogTagInput>? BlogTags { get; set; }
 
+        public IFormFile? CoverImageFile { get; set; }
+        public IFormFile? ContentImageFile { get; set; }
+
         public class BlogTagInput
         {
             public int TagId { get; set; }

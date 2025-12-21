@@ -15,10 +15,8 @@ namespace BizCompany.API.Controllers
         {
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
-            {
                 return NotFound("No records found.");
-            }
-            
+
             var categories = values.Select(c => new GetBlogCategoryDto
             {
                 Id = c.Id,

@@ -15,9 +15,7 @@ namespace BizCompany.API.Controllers
         {
             var values = await repository.GetAllAsync();
             if (values == null || values.Count == 0)
-            {
-                return BadRequest("No records found.");
-            }
+                return NotFound("No records found.");
 
             var records = values.Select(x => new GetMessageDto
             {

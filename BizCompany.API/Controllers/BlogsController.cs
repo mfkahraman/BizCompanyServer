@@ -2,14 +2,14 @@
 using BizCompany.API.DTOs;
 using BizCompany.API.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace BizCompany.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class BlogsController(IBaseRepository<Blog> repository,
-                                 BlogRepository blogRepository)
+                                 BlogRepository blogRepository,
+                                 IImageService imageService)
         : ControllerBase
     {
         [HttpGet]
@@ -190,10 +190,33 @@ namespace BizCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(BlogDto dto)
+        public async Task<IActionResult> Create([FromForm] BlogDto dto)
         {
+            string? savedCoverPath = null;
+            string? savedContentPath = null;
+
             try
             {
+                if (dto.CoverImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.CoverImageFile);
+                    if (validationError != null) return validationError;
+
+                    savedCoverPath = await imageService.SaveImageAsync(
+                        dto.CoverImageFile, "blogs");
+                    dto.CoverImageUrl = savedCoverPath;
+                }
+
+                if (dto.ContentImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.ContentImageFile);
+                    if (validationError != null) return validationError;
+
+                    savedContentPath = await imageService.SaveImageAsync(
+                        dto.ContentImageFile, "blogs");
+                    dto.ContentImageUrl = savedContentPath;
+                }
+
                 Blog blog = new()
                 {
                     Title = dto.Title,
@@ -210,6 +233,11 @@ namespace BizCompany.API.Controllers
                 var result = await blogRepository.CreateBlogAsync(blog);
                 if (!result)
                 {
+                    if (savedCoverPath != null)
+                        await imageService.DeleteImageAsync(savedCoverPath);
+                    if (savedContentPath != null)
+                        await imageService.DeleteImageAsync(savedContentPath);
+
                     return BadRequest("Failed to create blog.");
                 }
 
@@ -217,31 +245,65 @@ namespace BizCompany.API.Controllers
             }
             catch (Exception ex)
             {
+                if (savedCoverPath != null)
+                    await imageService.DeleteImageAsync(savedCoverPath);
+                if (savedContentPath != null)
+                    await imageService.DeleteImageAsync(savedContentPath);
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, BlogDto dto)
+        public async Task<IActionResult> Update(int id,[FromForm] BlogDto dto)
         {
             try
             {
-                Blog blog = new()
+                var record = await repository.GetByIdAsync(id);
+                if (record == null)
                 {
-                    Id = id,
-                    Title = dto.Title,
-                    Content = dto.Content,
-                    CoverImageUrl = dto.CoverImageUrl,
-                    ContentImageUrl = dto.ContentImageUrl,
-                    WriterId = dto.WriterId,
-                    CategoryId = dto.CategoryId,
-                    BlogTags = dto.BlogTags?.Select(bt => new BlogTag
-                    {
-                        TagId = bt.TagId
-                    }).ToList()
-                };
+                    return NotFound($"Record with ID {id} not found.");
+                }
 
-                var result = await blogRepository.UpdateBlogAsync(blog);
+                var oldCoverPath = record.CoverImageUrl;
+                var oldContentPath = record.ContentImageUrl;
+
+                if (dto.CoverImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.CoverImageFile);
+                    if (validationError != null) return validationError;
+
+                    if (!string.IsNullOrEmpty(oldCoverPath))
+                        await imageService.DeleteImageAsync(oldCoverPath);
+
+                    var imagePath = await imageService.SaveImageAsync(dto.CoverImageFile, "blogs");
+                    dto.CoverImageUrl = imagePath;
+                }
+
+                if (dto.ContentImageFile != null)
+                {
+                    var validationError = ValidateImageFile(dto.ContentImageFile);
+                    if (validationError != null) return validationError;
+
+                    if (!string.IsNullOrEmpty(oldContentPath))
+                        await imageService.DeleteImageAsync(oldContentPath);
+
+                    var imagePath = await imageService.SaveImageAsync(dto.ContentImageFile, "blogs");
+                    dto.ContentImageUrl = imagePath;
+                }
+                
+                record.Title = dto.Title;
+                record.Content = dto.Content;
+                record.CoverImageUrl = dto.CoverImageUrl ?? record.CoverImageUrl;
+                record.ContentImageUrl = dto.ContentImageUrl ?? record.ContentImageUrl;
+                record.WriterId = dto.WriterId;
+                record.CategoryId = dto.CategoryId;
+                record.BlogTags = dto.BlogTags?.Select(bt => new BlogTag
+                {
+                    TagId = bt.TagId
+                }).ToList();
+
+                var result = await blogRepository.UpdateBlogAsync(record);
 
                 if (!result)
                     return BadRequest("An error occurred while updating the record");
@@ -259,6 +321,18 @@ namespace BizCompany.API.Controllers
         {
             try
             {
+                var record = await repository.GetByIdAsync(id);
+                if (record == null)
+                {
+                    return BadRequest($"Record with ID {id} not found.");
+                }
+
+                if (!string.IsNullOrEmpty(record.CoverImageUrl))
+                    await imageService.DeleteImageAsync(record.CoverImageUrl);
+
+                if (!string.IsNullOrEmpty(record.ContentImageUrl))
+                    await imageService.DeleteImageAsync(record.ContentImageUrl);
+
                 var result = await repository.RemoveAsync(id);
 
                 if (!result)
@@ -268,11 +342,24 @@ namespace BizCompany.API.Controllers
 
                 return Ok($"Record with ID {id} successfully deleted.");
             }
-
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred during the delete operation: {ex.Message}");
             }
+        }
+
+        private BadRequestObjectResult? ValidateImageFile(IFormFile file)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                return BadRequest("Invalid file type. Only images are allowed.");
+
+            if (file.Length > 5 * 1024 * 1024) // 5MB
+                return BadRequest("File size cannot exceed 5MB.");
+
+            return null; // Valid
         }
     }
 }
